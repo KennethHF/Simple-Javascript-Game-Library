@@ -47,7 +47,6 @@ function Vector(x,y) { return createVector(x,y); }
 
 function Mouse() { return new Vector(mouseX, mouseY); }
 
-
 var Direction = {
   Invalid: -1,
   North: 0,
@@ -115,6 +114,14 @@ function fillStroke(clrF, clrS) {
   noStroke();
   if (clrF != null) fill(clrF);
   if (clrS != null) stroke(clrS);
+}
+
+function chance(perc) {
+  //Returns true if percentage chance randomly occurs
+  if (perc >= 100) return true;
+  if (perc <= 0) return false;
+  var c = random(100) + 1;
+  return (c <= perc);
 }
 
 //Returns an array of perlin noise values
