@@ -5,6 +5,9 @@ The purpose of this file is provide an assortment of tools to aid in the develop
 of javascript game projects.  The p5.js library is required as many of the objects,
 classes, and functions require this library to work. It can be found at:
 https://p5.js.org
+
+Version Dates
+6 Dec 2019 (1.0.0)
 ************************************************************************************/
 /*  
 P5 Events List (requires p5.js)
@@ -511,7 +514,7 @@ class Sprite {
     this.imageObject = imgObj;
     this.x = 0;
     this.y = 0;
-    this.i = 0;
+    this.index = 0;
   }
 
   width() { return this._width; }
@@ -526,15 +529,15 @@ class Sprite {
   }
 
   draw(optDestWidth, optDestHeight) {
-    if (this.i < 0 || this.i >= this.size()) return;
+    if (this.index < 0 || this.index >= this.size()) return;
     var destWidth = (optDestWidth == null ? this.width() : optDestWidth);
     var destHeight = (optDestHeight == null ? this.height() : optDestHeight);
 
     var srcX = 0;
     var srcY = 0;
-    if (this.i != 0) {
-      srcX = (this.i % this.columns()) * this.width();
-      srcY = Math.floor(this.i / this.columns()) * this.height();
+    if (this.index != 0) {
+      srcX = (this.index % this.columns()) * this.width();
+      srcY = Math.floor(this.index / this.columns()) * this.height();
     }
 
     var destX = this.x;
@@ -544,15 +547,69 @@ class Sprite {
   }
 }
 
+class ValuesList {
+  constructor(arrayName) {
+    this.list = [];
+    for (var attr of arrayName)
+      this.list.push({name: attr, value: 0});
+  }
 
+  get(index) {
+    if (isNaN(index)) {
+      for (var element of this.list)
+        if (element.name.toUpperCase() == index.toUpperCase()) return element.value;
+    } else {
+      return this.list[index].value;
+    }
+  }
 
+  set(index, val) {
+    if (val == null || val == undefined) val = 0;
+    if (isNaN(index)) {
+      for (var element of this.list)
+        if (element.name.toUpperCase() == index.toUpperCase()) element.value = val;
+    } else {
+      if (index < 0 || index > (this.size() - 1)) return;
+      this.list[index].value = val;
+    }
+  }
 
+  size() {
+    return this.list.length;
+  }
 
+  clear() {
+    for (var element of this.list)
+      element.value = 0;
+  }
 
+  /*Overwrites existing values, setting them equal to the parameter list values*/
+  copy(fromList) {
+    for (var i = 0; i < this.size(); i++) {
+      if (this.list[i].name == fromList.list[i].name)
+        this.set(i, fromList.get(i));
+    }
+  }
 
+  /*Adds the parameter list values to this list*/
+  add(fromList) {
+    //Adds the values of the names shared in common between both lists
+    for (var i = 0; i < this.size(); i++) {
+      for (var j = 0; j < fromList.size(); j++) {
+        if (this.list[i].name == fromList.list[j].name)
+          this.set(i, this.get(i) + fromList.get(j));
+      }
+    }
+  }
 
+  toString() {
+    var str = "";
+    for (var i = 0; i < this.size(); i++)
+      str += `${i} {name:${this.list[i].name}  value:${this.get(i)}}\n`;
+    return str;
+  }
 
-
+}
 
 
 
