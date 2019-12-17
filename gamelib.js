@@ -9,6 +9,7 @@ https://p5.js.org
 Version Dates
 6 Dec 2019 (1.0.0) : Finalized
 17 Dec 2019 (1.0.1) : optDestObj added to Sprite.draw()
+		                  added isColorEqual()
 ************************************************************************************/
 /*  
 P5 Events List (requires p5.js)
@@ -112,6 +113,13 @@ var Color = {
   White: "#FFFFFF",
   Black: "#000000"
 };
+
+function isColorEqual(clr1, clr2) {
+ return ((red(clr1) == red(clr2)) &&
+         (green(clr1) == green(clr2)) &&
+         (blue(clr1) == blue(clr2)) &&
+         (alpha(clr1) == alpha(clr2)))
+}
 
 function fillStroke(clrF, clrS) {
   noFill();
