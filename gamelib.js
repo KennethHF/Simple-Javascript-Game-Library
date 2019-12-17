@@ -7,7 +7,8 @@ classes, and functions require this library to work. It can be found at:
 https://p5.js.org
 
 Version Dates
-6 Dec 2019 (1.0.0)
+6 Dec 2019 (1.0.0) : Finalized
+17 Dec 2019 (1.0.1) : optDestObj added to Sprite.draw()
 ************************************************************************************/
 /*  
 P5 Events List (requires p5.js)
@@ -528,7 +529,7 @@ class Sprite {
     this.y = y;
   }
 
-  draw(optDestWidth, optDestHeight) {
+  draw(optDestWidth, optDestHeight, optDestObj) {
     if (this.index < 0 || this.index >= this.size()) return;
     var destWidth = (optDestWidth == null ? this.width() : optDestWidth);
     var destHeight = (optDestHeight == null ? this.height() : optDestHeight);
@@ -542,8 +543,13 @@ class Sprite {
 
     var destX = this.x;
     var destY = this.y;
-    image(this.imageObject, destX, destY, destWidth, destHeight,
+    if (optDestObj != null) {
+      optDestObj.image(this.imageObject, destX, destY, destWidth, destHeight,
       srcX, srcY, this.width(), this.height());
+    } else {
+      image(this.imageObject, destX, destY, destWidth, destHeight,
+      srcX, srcY, this.width(), this.height());
+    }
   }
 }
 
