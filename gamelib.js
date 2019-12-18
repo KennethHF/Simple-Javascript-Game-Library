@@ -9,7 +9,7 @@ https://p5.js.org
 Version Dates
 6 Dec 2019 (1.0.0) : Finalized
 17 Dec 2019 (1.0.1) : optDestObj added to Sprite.draw()
-		                  added isColorEqual()
+		                  added isColorEqual() / added ascii()
 ************************************************************************************/
 /*  
 P5 Events List (requires p5.js)
@@ -46,24 +46,24 @@ P5 Global Variables
 "use strict";
 function err(msg) { console.error(msg); }
 
-function Canvas(w,h) { return createCanvas(w,h); }
-function Graphic(w,h) { return createGraphics(w,h); }
-function Vector(x,y) { return createVector(x,y); }
+function Canvas(w, h) { return createCanvas(w, h); }
+function Graphic(w, h) { return createGraphics(w, h); }
+function Vector(x, y) { return createVector(x, y); }
 
 function Mouse() { return new Vector(mouseX, mouseY); }
 
 var Direction = {
   Invalid: -1,
   North: 0,
-  East : 1,
-  South : 2,
-  West : 3,
+  East: 1,
+  South: 2,
+  West: 3,
   NorthEast: 4,
   SouthEast: 5,
   SouthWest: 6,
   NorthWest: 7,
-  Left : 8,
-  Right : 9,
+  Left: 8,
+  Right: 9,
 };
 
 var Color = {
@@ -115,10 +115,14 @@ var Color = {
 };
 
 function isColorEqual(clr1, clr2) {
- return ((red(clr1) == red(clr2)) &&
-         (green(clr1) == green(clr2)) &&
-         (blue(clr1) == blue(clr2)) &&
-         (alpha(clr1) == alpha(clr2)))
+  return ((red(clr1) == red(clr2)) &&
+    (green(clr1) == green(clr2)) &&
+    (blue(clr1) == blue(clr2)) &&
+    (alpha(clr1) == alpha(clr2)))
+}
+
+function ascii(char) {
+  return char.charCodeAt(0);
 }
 
 function fillStroke(clrF, clrS) {
@@ -465,7 +469,7 @@ class Shape {
   height() { return this._height; }
   at() { return new Vector(this.x, this.y); }
 
-  move(x,y) {
+  move(x, y) {
     this.x = x;
     this.y = y;
   }
@@ -553,10 +557,10 @@ class Sprite {
     var destY = this.y;
     if (optDestObj != null) {
       optDestObj.image(this.imageObject, destX, destY, destWidth, destHeight,
-      srcX, srcY, this.width(), this.height());
+        srcX, srcY, this.width(), this.height());
     } else {
       image(this.imageObject, destX, destY, destWidth, destHeight,
-      srcX, srcY, this.width(), this.height());
+        srcX, srcY, this.width(), this.height());
     }
   }
 }
@@ -565,7 +569,7 @@ class ValuesList {
   constructor(arrayName) {
     this.list = [];
     for (var attr of arrayName)
-      this.list.push({name: attr, value: 0});
+      this.list.push({ name: attr, value: 0 });
   }
 
   get(index) {
@@ -683,7 +687,7 @@ function write(str, x, y, optObj) {
   if (optObj == null) {
     text(str, x, y);
   } else {
-    optObj.text(str,x,y);
+    optObj.text(str, x, y);
   }
 }
 
