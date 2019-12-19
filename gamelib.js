@@ -9,7 +9,8 @@ https://p5.js.org
 Version Dates
 6 Dec 2019 (1.0.0) : Finalized
 17 Dec 2019 (1.0.1) : optDestObj added to Sprite.draw()
-		                  added isColorEqual() / added ascii()
+		      added isColorEqual()
+19 Dec 2019 (1.0.2) : Added fromIndex() to Color object
 ************************************************************************************/
 /*  
 P5 Events List (requires p5.js)
@@ -46,24 +47,24 @@ P5 Global Variables
 "use strict";
 function err(msg) { console.error(msg); }
 
-function Canvas(w, h) { return createCanvas(w, h); }
-function Graphic(w, h) { return createGraphics(w, h); }
-function Vector(x, y) { return createVector(x, y); }
+function Canvas(w,h) { return createCanvas(w,h); }
+function Graphic(w,h) { return createGraphics(w,h); }
+function Vector(x,y) { return createVector(x,y); }
 
 function Mouse() { return new Vector(mouseX, mouseY); }
 
 var Direction = {
   Invalid: -1,
   North: 0,
-  East: 1,
-  South: 2,
-  West: 3,
+  East : 1,
+  South : 2,
+  West : 3,
   NorthEast: 4,
   SouthEast: 5,
   SouthWest: 6,
   NorthWest: 7,
-  Left: 8,
-  Right: 9,
+  Left : 8,
+  Right : 9,
 };
 
 var Color = {
@@ -111,18 +112,67 @@ var Color = {
   LightGray: "#D3D3D3",
   DarkGray: "#505050",
   White: "#FFFFFF",
-  Black: "#000000"
+  Black: "#000000",
+
+  fromIndex: function(index) {
+    let clr = null;
+    switch (index) {
+      case (0): clr = Color.Red; break;
+      case (1): clr = Color.Maroon; break;
+      case (2): clr = Color.Crimson; break;
+      case (3): clr = Color.Salmon; break;
+      case (4): clr = Color.Pink; break;
+      case (5): clr = Color.HotPink; break;
+      case (6): clr = Color.Orange; break;
+      case (7): clr = Color.DarkOrange; break;
+      case (8): clr = Color.Gold; break;
+      case (9): clr = Color.Yellow; break;
+      case (10): clr = Color.LightYellow; break;
+      case (11): clr = Color.Manilla; break;
+      case (12): clr = Color.Khaki; break;
+      case (13): clr = Color.Lavender; break;
+      case (14): clr = Color.Violet; break;
+      case (15): clr = Color.Magenta; break;
+      case (16): clr = Color.DarkMagenta; break;
+      case (17): clr = Color.Purple; break;
+      case (18): clr = Color.Lime; break;
+      case (19): clr = Color.SeaGreen; break;
+      case (20): clr = Color.Green; break;
+      case (21): clr = Color.DarkGreen; break;
+      case (22): clr = Color.Olive; break;
+      case (23): clr = Color.Teal; break;
+      case (24): clr = Color.Aqua; break;
+      case (25): clr = Color.Cyan; break;
+      case (26): clr = Color.LightCyan; break;
+      case (27): clr = Color.Turquoise; break;
+      case (28): clr = Color.LightBlue; break;
+      case (29): clr = Color.SkyBlue; break;
+      case (30): clr = Color.Blue; break;
+      case (31): clr = Color.DarkBlue; break;
+      case (32): clr = Color.Navy; break;
+      case (33): clr = Color.Bisque; break;
+      case (34): clr = Color.Wheat; break;
+      case (35): clr = Color.Tan; break;
+      case (36): clr = Color.Snow; break;
+      case (37): clr = Color.MintCream; break;
+      case (38): clr = Color.Seashell; break;
+      case (39): clr = Color.Ivory; break;
+      case (40): clr = Color.Gray; break;
+      case (41): clr = Color.LightGray; break;
+      case (42): clr = Color.DarkGray; break;
+      case (43): clr = Color.White; break;
+      case (44): clr = Color.Black; break;
+      default: clr = Color.Black; break;
+    }
+    return clr;
+  }
 };
 
 function isColorEqual(clr1, clr2) {
-  return ((red(clr1) == red(clr2)) &&
-    (green(clr1) == green(clr2)) &&
-    (blue(clr1) == blue(clr2)) &&
-    (alpha(clr1) == alpha(clr2)))
-}
-
-function ascii(char) {
-  return char.charCodeAt(0);
+ return ((red(clr1) == red(clr2)) &&
+         (green(clr1) == green(clr2)) &&
+         (blue(clr1) == blue(clr2)) &&
+         (alpha(clr1) == alpha(clr2)))
 }
 
 function fillStroke(clrF, clrS) {
@@ -469,7 +519,7 @@ class Shape {
   height() { return this._height; }
   at() { return new Vector(this.x, this.y); }
 
-  move(x, y) {
+  move(x,y) {
     this.x = x;
     this.y = y;
   }
@@ -557,10 +607,10 @@ class Sprite {
     var destY = this.y;
     if (optDestObj != null) {
       optDestObj.image(this.imageObject, destX, destY, destWidth, destHeight,
-        srcX, srcY, this.width(), this.height());
+      srcX, srcY, this.width(), this.height());
     } else {
       image(this.imageObject, destX, destY, destWidth, destHeight,
-        srcX, srcY, this.width(), this.height());
+      srcX, srcY, this.width(), this.height());
     }
   }
 }
@@ -569,7 +619,7 @@ class ValuesList {
   constructor(arrayName) {
     this.list = [];
     for (var attr of arrayName)
-      this.list.push({ name: attr, value: 0 });
+      this.list.push({name: attr, value: 0});
   }
 
   get(index) {
@@ -687,7 +737,7 @@ function write(str, x, y, optObj) {
   if (optObj == null) {
     text(str, x, y);
   } else {
-    optObj.text(str, x, y);
+    optObj.text(str,x,y);
   }
 }
 
