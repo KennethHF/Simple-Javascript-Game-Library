@@ -11,6 +11,7 @@ Version Dates
 17 Dec 2019 (1.0.1) : optDestObj added to Sprite.draw()
 		      added isColorEqual()
 19 Dec 2019 (1.0.2) : Added fromIndex() to Color object
+28 Dec 2019 (1.0.3) : Added doesContain() to Rect()
 ************************************************************************************/
 /*  
 P5 Events List (requires p5.js)
@@ -540,6 +541,10 @@ class Rect extends Shape {
     if ((this.x > rect2.x + rect2.width())) return false;
     if ((this.x + this.width()) < rect2.x) return false;
     return true;
+  }
+	
+  doesContain(x, y) {
+    return this.doesCollide(new Rect(x, y, 1, 1));
   }
 }
 
