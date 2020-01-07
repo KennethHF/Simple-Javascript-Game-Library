@@ -12,6 +12,7 @@ Version Dates
 		      added isColorEqual()
 19 Dec 2019 (1.0.2) : Added fromIndex() to Color object
 28 Dec 2019 (1.0.3) : Added doesContain() to Rect()
+07 Jan 2020 (1.0.4) : Removed Canvas()
 ************************************************************************************/
 /*  
 P5 Events List (requires p5.js)
@@ -48,7 +49,7 @@ P5 Global Variables
 "use strict";
 function err(msg) { console.error(msg); }
 
-function Canvas(w,h) { return createCanvas(w,h); }
+//function Canvas(w,h) { return createCanvas(w,h); }
 function Graphic(w,h) { return createGraphics(w,h); }
 function Vector(x,y) { return createVector(x,y); }
 
