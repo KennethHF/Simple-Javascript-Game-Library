@@ -1,0 +1,167 @@
+/**********************************
+CHARATER CLASS INTERFACE
+
+-Assumes variable 'characterSprite' exists which is the  sprite object to the characters.png sheet
+
+-No matter what the character is doing,
+ it is always facing a direction (South by default).
+
+Possible States:
+  Standing
+  Walking
+  Attacking
+  Defending
+  Chopping
+  Digging
+  Building
+
+Initialization parameters:
+new Character(sheetIndex, x, y)  sheetIndex = image index from the characters.png sheet, 
+                                 x/y = starting coord. location on screen of character
+
+Public Methods:
+  .resize(w,h) = Resizes the outputted dimensions of the character sprite
+  .draw() = Draws the current character animation to the screen
+  .face(Direction) = Changes the direction the character is facing
+  .walk(optDist) = Walks forward an optional distance (parameter) or until stop() is called
+  .stop() = Stops whatever task the character is doing (returns to standing state) 
+
+All other methods are utility (private) - do not call outside class
+
+***********************************/
+
+ let CharacterState = {
+  Standing : 0,
+  Walking : 1,
+  Attacking : 2,
+  Defending : 3,
+  Chopping : 4,
+  Digging : 5,
+  Building : 6
+ };
+
+class Character {
+ constructor(sheetIndex, x, y) {
+   this._imageSet = sheetIndex;
+   this._facing = 0;
+   this._speed = 250; //milliseconds
+   this._lastTick = 0;
+   this._image = 0;
+   this._position = createVector(x, y);
+   this._width = 48;
+   this._height = 48;
+   this._state = CharacterState.Standing;
+   this._animateSequence = 0;
+ }
+
+ resize(w, h) {
+  this._width = w;
+  this._height = h;
+ }
+
+ face(dir) {
+  switch (dir) {
+    case (Direction.North): this._facing = 3; break;
+    case (Direction.South): this._facing = 0; break;
+    case (Direction.East): this._facing = 2; break;
+    case (Direction.West): this._facing = 1; break;
+  }
+ }
+
+ stop() {
+  this._state = CharacterState.Standing;  }
+
+ walk() {
+  this._state = CharacterState.Walking;
+  this._position.y += 0.5;
+ }
+
+ draw() {
+   this._animate();
+   characterSprite.index = this._standingIndex() + this._animateSequence;
+   characterSprite.move(this._position.x, this._position.y);
+   characterSprite.draw(this._width, this._height);  }
+
+
+
+ //******** UTILITY ************
+
+ _animate() {
+  if (this._state == CharacterState.Standing) {
+    this._animateSequence = 0;
+    return;
+  }
+  let newTick = floor(millis() / this._speed);
+  if (this._lastTick < newTick) {
+    this._lastTick = newTick;
+
+    if (this._state == CharacterState.Walking) 
+      this._animateSequence = (this._animateSequence == -1 ? 1 : -1);
+  }
+ }
+
+ _standingIndex() {
+  //Second sprite (standing south face) of each image group
+  let standing = (this._imageSet * 3) + (Math.floor(this._imageSet / 12) * 108) + 1;
+  return (standing + (this._facing * 36));  }
+
+
+}
+
+
+
+***************************************************
+
+class ProgressCircle {
+ constructor(x, y) {
+   this.SIZE = 48;
+   this.x = x;
+   this.y = y;
+   this.percent = 100;
+   this.enabled = true;
+   this.pivot = 0;
+ }
+
+ init(optPerc) {
+  this.percent = (optPerc == null ? 100 : optPerc);
+  if (isNaN(this.percent)) this.percent = 0;
+  if (this.percent < 0) this.percent = 0;
+  if (this.percent > 100) this.percent = 100;
+  this.enable();
+ }
+
+ pointAtDegree(deg) {
+  let p = {x:0, y:0};
+  p.x = this.x + (this.radius() * cos(radians(deg)));
+  p.y = this.y + (this.radius() * sin(radians(deg)));
+  return p;
+ }
+
+ radius() {
+  return (this.SIZE / 2);
+ }
+
+ tick(amount) {
+  if (!this.isEnabled()) return;
+  this.percent -= amount;
+  if (this.percent <= 0) this.disable();
+ }
+
+ isEnabled() { return this.enabled; }
+ enable() { this.enabled = true; }
+ disable() { this.enabled = false; }
+
+ draw() {
+  if (!this.isEnabled()) return;
+   noStroke();
+   //fill(0, 75);
+   //ellipse(this.x, this.y, this.SIZE);
+   if (this.percent <= 0) return;
+   if (this.percent > 100) this.percent = 100;
+   let deg = map(this.percent, 0, 100, 0, 359);
+   fill(255, 75);
+   let startDegree = this.pivot - (deg / 2);
+   arc(this.x, this.y, this.SIZE, this.SIZE, radians(startDegree), radians(startDegree) + radians(deg));
+ }
+
+}
