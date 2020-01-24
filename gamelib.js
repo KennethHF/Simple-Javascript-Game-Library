@@ -457,7 +457,7 @@ class Grid {
 
       //Check neighbors
       for (var n = 0; n < neighborCount; n++) {
-        thisNeighbor = this.neighbor(thisNode, n);
+        thisNeighbor = this.neighbor(this.cell(thisNode), n);
         if (thisNeighbor == null) continue;
 
         thisNeighbor = thisNeighbor.index;
