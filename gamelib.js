@@ -13,6 +13,14 @@ Version Dates
 19 Dec 2019 (1.0.2) : Added fromIndex() to Color object
 28 Dec 2019 (1.0.3) : Added doesContain() to Rect()
 07 Jan 2020 (1.0.4) : Removed Canvas()
+12 Jan 2020 (1.1.0) : Added Control class,
+                      Removed Shape class,
+                      Renamed Rect class to Rectangle
+                      Readjusted inherited Shape classes -
+                      (Rectangle, Ellipse, Circle) to Control
+                      Removed fillStroke(); added -
+                      getFill(), setFill(), getStroke(), setStroke()
+26 Jan 2020 (1.1.1) : Fixed error in findPath()
 ************************************************************************************/
 /*  
 P5 Events List (requires p5.js)
@@ -49,10 +57,8 @@ P5 Global Variables
 "use strict";
 function err(msg) { console.error(msg); }
 
-//function Canvas(w,h) { return createCanvas(w,h); }
 function Graphic(w,h) { return createGraphics(w,h); }
 function Vector(x,y) { return createVector(x,y); }
-
 function Mouse() { return new Vector(mouseX, mouseY); }
 
 var Direction = {
@@ -177,11 +183,26 @@ function isColorEqual(clr1, clr2) {
          (alpha(clr1) == alpha(clr2)))
 }
 
-function fillStroke(clrF, clrS) {
-  noFill();
-  noStroke();
-  if (clrF != null) fill(clrF);
-  if (clrS != null) stroke(clrS);
+//Allows the use of getters for fill/stroke functions
+let CURRENT_FILL_COLOR = null;
+let CURRENT_STROKE_COLOR = Color.Black;
+function getFill() { return CURRENT_FILL_COLOR; }
+function getStroke() { return CURRENT_STROKE_COLOR; }
+function setFill(clr) {
+  CURRENT_FILL_COLOR = clr;
+  if (clr == null) {
+    noFill();
+  } else {
+    fill(clr);
+  }
+}
+function setStroke(clr) {
+  CURRENT_STROKE_COLOR = clr;
+  if (clr == null) {
+    noStroke();
+  } else {
+    stroke(clr);
+  }
 }
 
 function chance(perc) {
@@ -508,72 +529,133 @@ class Grid {
   }
 }
 
-
-class Shape {
-  constructor(x, y, width, height) {
-    this.x = x;
-    this.y = y;
-    this._width = width;
-    this._height = height;
+/* CONTROL
+ * A Control is an object that is meant
+ * to be drawn to the canvas and interacted
+ * with through mouse events.
+ */
+class Control {
+  constructor() {
+    this._x = 0;
+    this._y = 0;
+    this._w = 0;
+    this._h = 0;
+    this._enabled = true;
   }
 
-  width() { return this._width; }
-  height() { return this._height; }
-  at() { return new Vector(this.x, this.y); }
+  //Getters
+  at() { return new Vector(this._x, this._y); }
+  width() { return this._w; }
+  height() { return this._h; }
+  isEnabled() { return this._enabled; }
 
-  move(x,y) {
-    this.x = x;
-    this.y = y;
+  //Setters
+  resize(w, h) {
+    this._w = (w == null || isNaN(w) || w < 0 ? 0 : w);
+    this._h = (h == null || isNaN(h) || h < 0 ? 0 : h);
   }
-
-  draw() {
-    rect(this.x, this.y, this._width, this._height);
+  move(x, y) {
+    this._x = (x == null || isNaN(x) ? 0 : x);
+    this._y = (y == null || isNaN(y) ? 0 : y);
   }
-}
+  enable() { this._enabled = true; }
+  disable() { this._enabled = false; }
 
-class Rect extends Shape {
-  constructor(x, y, width, height) {
-    super(x, y, width, height);
-  }
-
-  doesCollide(rect2) {
-    if (this.y > (rect2.y + rect2.height())) return false;
-    if ((this.y + this.height()) < rect2.y) return false;
-    if ((this.x > rect2.x + rect2.width())) return false;
-    if ((this.x + this.width()) < rect2.x) return false;
+  /* Method: contains(x, y)
+   * Returns true if the x,y coordinate
+   * exists inside the bounds of the control.
+   * This method should be overwritten
+   * by inheriting class if non-rectangular
+   * shape is used.
+   */
+  contains(x, y) {
+    if (!this.isEnabled()) return false;
+    if (x < this.at().x || x > (this.at().x + this.width())) return false;
+    if (y < this.at().y || y > (this.at().y + this.height())) return false;
     return true;
   }
-	
-  doesContain(x, y) {
-    return this.doesCollide(new Rect(x, y, 1, 1));
-  }
-}
 
-class Ellipse extends Shape {
-  constructor(x, y, width, height) {
-    super(x, y, width, height);
+  //Just like contains(x,y), should be overwritten
+  //if the inheriting class is non-rectangular
+  isMouseOver() {
+    return (this.contains(mouseX, mouseY));
   }
+
+  //Methods which must be overwritten by inheriting class
   draw() {
-    ellipse(this.x, this.y, this.width(), this.height());
+    console.error("Control.draw() method not overwritten by inherited class.");
+  }
+
+}
+
+class Rectangle extends Control {
+  constructor(x, y, w, h) {
+    super();
+    this.move(x, y);
+    this.resize(w, h);
+  }
+
+  //Returns true if a second rectangle
+  //collides at any point with this one.
+  collides(rect2) {
+    if (this.at().y > (rect2.at().y + rect2.height())) return false;
+    if ((this.at().y + this.height()) < rect2.at().y) return false;
+    if ((this.at().x > rect2.at().x + rect2.width())) return false;
+    if ((this.at().x + this.width()) < rect2.at().x) return false;
+    return true;
+  }
+
+  draw(optGraphic) {
+    if (optGraphic == null) {
+      rect(this.at().x, this.at().y, this.width(), this.height());
+    } else {
+      optGraphic.rect(this.at().x, this.at().y, this.width(), this.height());
+    }
   }
 }
 
-class Circle extends Shape {
+class Ellipse extends Control {
+  constructor(x, y, w, h) {
+    super();
+    this.move(x, y);
+    this.resize(w, h);
+  }
+  draw(optGraphic) {
+    if (optGraphic == null) {
+      ellipse(this.at().x, this.at().y, this.width(), this.height());
+    } else {
+      optGraphic.ellipse(this.at().x, this.at().y, this.width(), this.height());
+    }
+  }
+}
+
+class Circle extends Control {
   constructor(x, y, radius) {
-    super(x, y, radius * 2, radius * 2);
-    this._radius = radius;
+    super();
+    this.move(x, y);
+    this.resize(radius * 2, radius * 2);
   }
 
-  radius() { return this._radius; }
+  radius() { return (this.width()/2); }
 
-  draw() {
-    ellipse(this.x, this.y, this.radius() * 2, this.radius() * 2);
+  contains(x, y) {
+    let centerDistance = this.at().dist(new Vector(x, y));
+    return (centerDistance <= (this.radius()));
   }
 
-  doesCollide(circle2) {
-    var centerDistance = this.at().dist(circle2.at());
+  collides(circle2) {
+    let centerDistance = this.at().dist(circle2.at());
     return (centerDistance <= (this.radius() + circle2.radius()));
   }
+
+  draw(optGraphic) {
+    if (optGraphic == null) {
+      ellipse(this.at().x, this.at().y, this.radius() * 2, this.radius() * 2);
+    } else {
+      optGraphic.ellipse(this.at().x, this.at().y, this.radius() * 2, this.radius() * 2);
+    }
+  }
+
 }
 
 class Sprite {
