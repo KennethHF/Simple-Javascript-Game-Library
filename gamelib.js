@@ -7,7 +7,7 @@ classes, and functions require this library to work. It can be found at:
 https://p5.js.org
 
 Version Dates
-6 Dec 2019 (1.0.0) : Finalized
+06 Dec 2019 (1.0.0) : Finalized
 17 Dec 2019 (1.0.1) : optDestObj added to Sprite.draw()
 		      added isColorEqual()
 19 Dec 2019 (1.0.2) : Added fromIndex() to Color object
@@ -21,6 +21,11 @@ Version Dates
                       Removed fillStroke(); added -
                       getFill(), setFill(), getStroke(), setStroke()
 26 Jan 2020 (1.1.1) : Fixed error in findPath()
+20 Mar 2020 (1.1.2) : Added DebugList class
+26 Mar 2020 (1.1.3) : Added Timer class, 
+                      Added setColors(), restoreColors() functions
+29 Mar 2020 (1.1.4) : Updated findPath() to return null instead of an 
+                      empty array if no path is found
 ************************************************************************************/
 /*  
 P5 Events List (requires p5.js)
@@ -205,6 +210,20 @@ function setStroke(clr) {
   }
 }
 
+//Better color controller
+let PREV_FILL_COLOR = null;
+let PREV_STROKE_COLOR = Color.Black;
+function setColors(fClr, sClr) {
+ PREV_FILL_COLOR = CURRENT_FILL_COLOR;
+ PREV_STROKE_COLOR = CURRENT_STROKE_COLOR;
+ setFill(fClr);
+ setStroke(sClr);
+}
+function restoreColors() {
+ setFill(PREV_FILL_COLOR);
+ setStroke(PREV_STROKE_COLOR);
+}
+
 function chance(perc) {
   //Returns true if percentage chance randomly occurs
   if (perc >= 100) return true;
@@ -229,6 +248,62 @@ function generateNoise(columns, rows, incr = 0.2) {
     rOff += incr;
   }
   return n;
+}
+
+class DebugList {
+  constructor(x, y) {
+    this.list = [];
+    this.x = (x == null ? 0 : x);
+    this.y = (y == null ? 0 : y);  
+  }
+
+  add(dataStr) {
+    this.list.push(dataStr);
+  }
+
+  draw() {
+    fill(255);
+    noStroke();
+    textAlign(LEFT, TOP);
+    textSize(24);
+    var lineFeed = 0;
+    for (var i = 0; i < this.list.length; i++) {
+      text(this.list[i], this.x, this.y + lineFeed);
+      lineFeed += 24;
+    } 
+  }
+}
+
+class Timer {
+  constructor(callFunction, millisecondsPerTick) {
+    this.tickRate = (millisecondsPerTick == null ? 500 : millisecondsPerTick);
+    this.funct = (callFunction == null ? this.emptyLoop : callFunction);
+    this.counter = 0;
+    this.clock = null;
+    this.paused = true;
+  }
+
+  ticks() { return this.counter; }
+  reset() { this.counter = 0; }
+  
+  start() {
+    this.clock = window.setInterval(this.tLoop.bind(this), this.tickRate);
+    this.paused = false;
+  }
+
+  stop() {
+    window.clearInterval(this.clock);
+    this.paused = true;
+  }
+
+  isStopped() { return this.paused; }
+
+  tLoop() { 
+    this.counter++; 
+    this.funct(); 
+  }
+  
+  emptyLoop(){};
 }
 
 
@@ -450,8 +525,8 @@ class Grid {
     var path = [];
     if (allowDiag == null) allowDiag = false;
 
-    if (startIndex < 0 || startIndex >= this.size()) return path;
-    if (endIndex < 0 || endIndex >= this.size()) return path;
+    if (startIndex < 0 || startIndex >= this.size()) return null;
+    if (endIndex < 0 || endIndex >= this.size()) return null;
 
     //Create nodes
     var nodes = [];
@@ -471,7 +546,7 @@ class Grid {
 
     while (true) {
       thisNode = this.getLowestFNodeIndex(nodes);
-      if (thisNode == null) return path;
+      if (thisNode == null) return null;
 
       nodes[thisNode].status = NodeStatus.CLOSED;
       if (thisNode == endIndex) break;
