@@ -26,6 +26,7 @@ Version Dates
                       Added setColors(), restoreColors() functions
 29 Mar 2020 (1.1.4) : Updated findPath() to return null instead of an 
                       empty array if no path is found
+21 Jun 2020 (1.1.5) : Added disableMouseRightClick()
 ************************************************************************************/
 /*  
 P5 Events List (requires p5.js)
@@ -222,6 +223,12 @@ function setColors(fClr, sClr) {
 function restoreColors() {
  setFill(PREV_FILL_COLOR);
  setStroke(PREV_STROKE_COLOR);
+}
+
+function disableMouseRightClick() {
+ document.addEventListener("contextmenu", function(e){
+    e.preventDefault();
+ }, false);
 }
 
 function chance(perc) {
