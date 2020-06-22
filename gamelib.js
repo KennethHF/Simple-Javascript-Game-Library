@@ -27,6 +27,7 @@ Version Dates
 29 Mar 2020 (1.1.4) : Updated findPath() to return null instead of an 
                       empty array if no path is found
 21 Jun 2020 (1.1.5) : Added disableMouseRightClick()
+22 Jun 2020 (1.1.6) : Added increment()
 ************************************************************************************/
 /*  
 P5 Events List (requires p5.js)
@@ -229,6 +230,18 @@ function disableMouseRightClick() {
  document.addEventListener("contextmenu", function(e){
     e.preventDefault();
  }, false);
+}
+
+//Increments along a line between two 
+//vectors (v1/v2) a specified distance (dst)
+function increment(v1, v2, dst) {
+ let d = dist(v1.x, v1.y, v2.x, v2.y);
+ let t = dst/d;
+ if (t < 0) return v1;
+ if (t > 1) return v2;
+ let x = ((1 - t) * v1.x) + (t * v2.x);
+ let y = ((1 - t) * v1.y) + (t * v2.y);
+ return new Vector(x, y);
 }
 
 function chance(perc) {
