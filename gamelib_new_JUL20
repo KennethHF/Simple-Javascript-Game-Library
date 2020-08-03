@@ -10,6 +10,7 @@ Version Dates
 06 Dec 2019 (1.0.0) : Finalized
 06 Jul 2020 (2.0.0) : Finalized
 20 Jul 2020 (2.0.1) : Added Control class
+03 Aug 2020 (2.0.2) : Added makeTransparent()
 
 Summary -
 
@@ -123,6 +124,18 @@ function generateNoise(columns, rows, incr = 0.2) {
     rOff += incr;
   }
   return n;
+}
+
+//Changes the parameter color of the parameter image transparent
+function makeTransparent(imgObj, replaceClr) {
+ imgObj.loadPixels();
+ for (let x = 0; x < imgObj.width; x++) {
+   for (let y = 0; y < imgObj.height; y++) {
+     let tmpClr = imgUnits.get(x, y);
+     if (isColorEqual(tmpClr, replaceClr) imgUnits.set(x, y, color(0,0));
+   }
+ }
+ imgObj.updatePixels();
 }
 
 let Direction = {
